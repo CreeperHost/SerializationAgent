@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+group 'net.creeperhost'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.ow2.asm:asm:9.2'
+    implementation 'com.google.code.gson:gson:2.10'
+
+    compileOnly 'org.jetbrains:annotations:23.1.0'
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+def downloadedJson = new File(buildDir, "downloadJson/serializationisbad.json")
+tasks.register('downloadJson') {
+    outputs.file(downloadedJson)
+    doFirst {
+        if (downloadedJson.exists()) {
+            downloadedJson.delete()
+        }
+        downloadedJson << new URL("https://raw.githubusercontent.com/dogboy21/serializationisbad/master/serializationisbad.json").getText("UTF-8")
+    }
+}
+
+
+jar.enabled false
+assemble.dependsOn shadowJar
+shadowJar {
+    dependsOn 'downloadJson'
+    configurations = [project.configurations.runtimeClasspath]
+
+    from downloadedJson
+
+    classifier ''
+    manifest {
+        attributes 'Premain-Class': 'net.creeperhost.sa.AgentMain'
+    }
+    exclude '**/module-info.class'
+    relocate 'org/objectweb', 'net/creeperhost/sa/repack/org/objectweb'
+    relocate 'com/google/gson', 'net/creeperhost/sa/repack/com/google/gson'
+}
