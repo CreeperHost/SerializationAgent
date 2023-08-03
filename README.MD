@@ -9,8 +9,7 @@ employs the use of an allow list for known objects which mods deserialize.
 
 ### To use
 
-Download the latest release available from GitHub:
-https://github.com/CreeperHost/Log4jPatcher/releases
+Download the latest release available from [GitHub](https://github.com/CreeperHost/SerializationAgent/releases).
 
 Add `-javaagent:SerializationAgent.jar` as a JVM argument.
 
